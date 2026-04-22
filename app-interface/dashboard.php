@@ -2,6 +2,18 @@
 require_once __DIR__ . '/../app-database-configuration/db_conn.php';
 $conn = createDbConnection();
 
+function mediaUrl(string $storedPath): string {
+    $normalizedPath = str_replace('\\', '/', $storedPath);
+    $mediaSegment = '/app-media/';
+    $mediaPosition = strpos($normalizedPath, $mediaSegment);
+
+    if ($mediaPosition !== false) {
+        return app_url(substr($normalizedPath, $mediaPosition + 1));
+    }
+
+    return app_url(ltrim($normalizedPath, '/'));
+}
+
 function fetchMedia($conn, $table, $fileCol) {
     $tableEsc = $conn->real_escape_string($table);
     $fileColEsc = $conn->real_escape_string($fileCol);
@@ -32,7 +44,7 @@ include __DIR__ . '/../app-shared/header.php';
     <section class="dash-section" id="upload-file">
         <h2>&#8679; Upload File</h2>
         <p>Supported formats: JPG, PNG, GIF &bull; MP4, AVI, MOV &bull; MP3, WAV &bull; PDF, DOC, DOCX</p>
-        <form action="/?page=upload" method="post" enctype="multipart/form-data" class="upload-form">
+        <form action="<?= htmlspecialchars(app_url('?page=upload')) ?>" method="post" enctype="multipart/form-data" class="upload-form">
             <label class="file-label" for="myFile">Choose File</label>
             <input type="file" id="myFile" name="fileToUpload"
                    accept=".jpg,.jpeg,.png,.gif,.mp4,.avi,.mov,.mp3,.wav,.pdf,.doc,.docx">
@@ -50,7 +62,7 @@ include __DIR__ . '/../app-shared/header.php';
             <div class="media-grid">
                 <?php foreach ($images as $img): ?>
                     <div class="media-card">
-                        <img src="/<?= htmlspecialchars(ltrim(str_replace('\\', '/', $img['images_file_location']), '/')) ?>" alt="<?= htmlspecialchars($img['title']) ?>" loading="lazy">
+                        <img src="<?= htmlspecialchars(mediaUrl($img['images_file_location'])) ?>" alt="<?= htmlspecialchars($img['title']) ?>" loading="lazy">
                         <div class="media-info">
                             <span class="media-title"><?= htmlspecialchars($img['title']) ?></span>
                             <span class="media-user"><?= htmlspecialchars($img['user']) ?></span>
@@ -71,7 +83,7 @@ include __DIR__ . '/../app-shared/header.php';
                 <?php foreach ($videos as $vid): ?>
                     <div class="media-card">
                         <video controls preload="metadata">
-                            <source src="/<?= htmlspecialchars(ltrim(str_replace('\\', '/', $vid['video_file_location']), '/')) ?>">
+                            <source src="<?= htmlspecialchars(mediaUrl($vid['video_file_location'])) ?>">
                             Your browser does not support the video tag.
                         </video>
                         <div class="media-info">
@@ -98,7 +110,7 @@ include __DIR__ . '/../app-shared/header.php';
                             <span class="media-user"><?= htmlspecialchars($track['user']) ?></span>
                         </div>
                         <audio controls preload="metadata">
-                            <source src="/<?= htmlspecialchars(ltrim(str_replace('\\', '/', $track['music_file_location']), '/')) ?>">
+                            <source src="<?= htmlspecialchars(mediaUrl($track['music_file_location'])) ?>">
                             Your browser does not support the audio tag.
                         </audio>
                     </div>
@@ -115,7 +127,7 @@ include __DIR__ . '/../app-shared/header.php';
         <?php else: ?>
             <div class="doc-list">
                 <?php foreach ($documents as $doc): ?>
-                    <a class="doc-card" href="/<?= htmlspecialchars(ltrim(str_replace('\\', '/', $doc['document_file_location']), '/')) ?>" target="_blank" rel="noopener">
+                    <a class="doc-card" href="<?= htmlspecialchars(mediaUrl($doc['document_file_location'])) ?>" target="_blank" rel="noopener">
                         <span class="doc-icon">&#128196;</span>
                         <div class="media-info">
                             <span class="media-title"><?= htmlspecialchars($doc['title']) ?></span>

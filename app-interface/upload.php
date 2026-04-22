@@ -1,7 +1,7 @@
 <?php
 // Only handle POST requests - redirect GET back to dashboard
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    header('Location: /');
+    header('Location: ' . (function_exists('app_url') ? app_url() : '/'));
     exit();
 }
 
@@ -58,7 +58,7 @@ if ($_FILES["fileToUpload"]["size"] > 5000000000) {
 
 if ($uploadOk == 0) {
     echo "<br>Redirecting back to the upload form in 3 seconds...";
-    header("Refresh: 3; URL=/");
+    header("Refresh: 3; URL=" . (function_exists('app_url') ? app_url() : '/'));
     exit();
 }
 
@@ -86,5 +86,5 @@ if (move_uploaded_file($_FILES["fileToUpload"]["tmp_name"], $target_file)) {
 }
 
 echo "<br>Redirecting back in 3 seconds...";
-header("Refresh: 3; URL=/");
+header("Refresh: 3; URL=" . (function_exists('app_url') ? app_url() : '/'));
 exit();
