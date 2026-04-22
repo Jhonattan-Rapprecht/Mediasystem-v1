@@ -5,6 +5,10 @@
  * the matching file in app-interface/.
  */
 
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
 $scriptDir = str_replace('\\', '/', dirname($_SERVER['SCRIPT_NAME'] ?? ''));
 $basePath = rtrim($scriptDir, '/');
 if ($basePath === '.' || $basePath === '/') {
@@ -23,8 +27,16 @@ function app_url(string $path = ''): string {
     return (APP_BASE_PATH === '' ? '' : APP_BASE_PATH) . '/' . $trimmedPath;
 }
 
+function is_debug_enabled(): bool {
+    return !empty($_SESSION['show_debug_panels']);
+}
+
+function set_debug_enabled(bool $enabled): void {
+    $_SESSION['show_debug_panels'] = $enabled;
+}
+
 $page    = $_GET['page'] ?? 'dashboard';
-$allowed = ['dashboard', 'upload'];
+$allowed = ['dashboard', 'upload', 'settings'];
 
 if (!in_array($page, $allowed, true)) {
     $page = 'dashboard';

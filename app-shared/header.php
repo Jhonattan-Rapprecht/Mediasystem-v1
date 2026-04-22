@@ -12,3 +12,18 @@
 
 </head>
 <body>
+
+<nav class="app-nav">
+    <a href="<?= htmlspecialchars(app_url()) ?>">Dashboard</a>
+    <a href="<?= htmlspecialchars(app_url('?page=settings')) ?>">Settings</a>
+</nav>
+
+<?php if (function_exists('is_debug_enabled') && is_debug_enabled()): ?>
+<div id="header-info-panel">
+    <ul>
+        <li><b>Root Path:</b> <?= htmlspecialchars($_SERVER['DOCUMENT_ROOT'] ?? '') ?></li>
+        <li><b>Current Script:</b> <?= htmlspecialchars($_SERVER['PHP_SELF'] ?? '') ?></li>
+        <li><b>Router Page:</b> <?= htmlspecialchars($_GET['page'] ?? 'dashboard') ?></li>
+    </ul>
+</div>
+<?php endif; ?>
