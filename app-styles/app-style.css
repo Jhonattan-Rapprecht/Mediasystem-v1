@@ -270,7 +270,12 @@ body {
 }
 
 .settings-section {
+    width: 100%;
     max-width: 720px;
+}
+
+.settings-layout {
+    align-items: center;
 }
 
 .settings-form {

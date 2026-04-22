@@ -64,7 +64,7 @@ if ($debugEnabled && $runDbTest) {
 include __DIR__ . '/../app-shared/header.php';
 ?>
 
-<div id="dashboard">
+<div id="dashboard" class="settings-layout">
     <section class="dash-section settings-section">
         <h2>Settings</h2>
 
