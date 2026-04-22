@@ -50,6 +50,7 @@ include __DIR__ . '/../app-shared/header.php';
         <h2>&#8679; Upload File</h2>
         <p>Supported formats: JPG, PNG, GIF &bull; MP4, AVI, MOV &bull; MP3, WAV &bull; PDF, DOC, DOCX</p>
         <form action="<?= htmlspecialchars(app_url('?page=upload')) ?>" method="post" enctype="multipart/form-data" class="upload-form">
+            <input type="hidden" name="csrf_token" value="<?= htmlspecialchars(csrf_token('upload')) ?>">
             <label class="file-label" for="myFile">Choose File</label>
             <input type="file" id="myFile" name="fileToUpload"
                    accept=".jpg,.jpeg,.png,.gif,.mp4,.avi,.mov,.mp3,.wav,.pdf,.doc,.docx">

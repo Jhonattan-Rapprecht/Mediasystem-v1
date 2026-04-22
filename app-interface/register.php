@@ -10,20 +10,24 @@ $error = '';
 $success = false;
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    if (!validate_csrf($_POST['csrf_token'] ?? null, 'register')) {
+        $error = 'Security validation failed. Please refresh and try again.';
+    }
+
     $username = trim($_POST['username'] ?? '');
     $email = trim($_POST['email'] ?? '');
     $password = $_POST['password'] ?? '';
     $confirmPassword = $_POST['confirm_password'] ?? '';
 
-    if ($username === '' || $email === '' || $password === '' || $confirmPassword === '') {
+    if ($error === '' && ($username === '' || $email === '' || $password === '' || $confirmPassword === '')) {
         $error = 'Please fill in all fields.';
-    } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+    } elseif ($error === '' && !filter_var($email, FILTER_VALIDATE_EMAIL)) {
         $error = 'Please enter a valid email address.';
-    } elseif (strlen($password) < 8) {
+    } elseif ($error === '' && strlen($password) < 8) {
         $error = 'Password must be at least 8 characters.';
-    } elseif ($password !== $confirmPassword) {
+    } elseif ($error === '' && $password !== $confirmPassword) {
         $error = 'Passwords do not match.';
-    } else {
+    } elseif ($error === '') {
         $conn = createDbConnection();
 
         $checkStmt = $conn->prepare('SELECT id FROM users WHERE username = ? OR email = ? LIMIT 1');
@@ -65,6 +69,7 @@ include __DIR__ . '/../app-shared/header.php';
         <?php endif; ?>
 
         <form method="post" action="<?= htmlspecialchars(app_url('?page=register')) ?>" class="settings-form">
+            <input type="hidden" name="csrf_token" value="<?= htmlspecialchars(csrf_token('register')) ?>">
             <label class="field-label" for="username">Username</label>
             <input class="field-input" type="text" name="username" id="username" required>
 

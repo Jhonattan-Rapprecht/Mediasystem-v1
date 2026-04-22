@@ -12,11 +12,15 @@ $error = '';
 $debugResetLink = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    if (!validate_csrf($_POST['csrf_token'] ?? null, 'forgot_password')) {
+        $error = 'Security validation failed. Please refresh and try again.';
+    }
+
     $email = trim($_POST['email'] ?? '');
 
-    if ($email === '' || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+    if ($error === '' && ($email === '' || !filter_var($email, FILTER_VALIDATE_EMAIL))) {
         $error = 'Please enter a valid email address.';
-    } else {
+    } elseif ($error === '') {
         $conn = createDbConnection();
 
         // Ensure reset table exists.
@@ -87,6 +91,7 @@ include __DIR__ . '/../app-shared/header.php';
         <?php endif; ?>
 
         <form method="post" action="<?= htmlspecialchars(app_url('?page=forgot-password')) ?>" class="settings-form">
+            <input type="hidden" name="csrf_token" value="<?= htmlspecialchars(csrf_token('forgot_password')) ?>">
             <label class="field-label" for="email">Email</label>
             <input class="field-input" type="email" name="email" id="email" required>
             <button type="submit" class="btn-upload">Send Reset Link</button>

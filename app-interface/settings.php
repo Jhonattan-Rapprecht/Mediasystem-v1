@@ -10,6 +10,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $action = $_POST['action'] ?? 'save_debug';
 
     if ($action === 'save_debug') {
+        if (!validate_csrf($_POST['csrf_token'] ?? null, 'settings_debug')) {
+            header('Location: ' . app_url('?page=settings&saved=0&csrf=invalid'));
+            exit();
+        }
+
         $showDebug = isset($_POST['show_debug_panels']) && $_POST['show_debug_panels'] === '1';
         set_debug_enabled($showDebug);
         header('Location: ' . app_url('?page=settings&saved=1'));
@@ -17,6 +22,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     if ($action === 'send_test_mail') {
+        if (!validate_csrf($_POST['csrf_token'] ?? null, 'settings_mail')) {
+            header('Location: ' . app_url('?page=settings&mailtest=csrf'));
+            exit();
+        }
+
         $target = trim($_POST['test_email'] ?? '');
         if ($target !== '' && filter_var($target, FILTER_VALIDATE_EMAIL)) {
             $ok = app_send_mail(
@@ -38,6 +48,7 @@ $saved = isset($_GET['saved']) && $_GET['saved'] === '1';
 $runDbTest = isset($_GET['testdb']) && $_GET['testdb'] === '1';
 $dbStatus = null;
 $mailTest = $_GET['mailtest'] ?? '';
+$csrfError = isset($_GET['csrf']) && $_GET['csrf'] === 'invalid';
 
 $smtpConfigured = (
     (getenv('APP_SMTP_HOST') ?: '') !== '' &&
@@ -61,8 +72,13 @@ include __DIR__ . '/../app-shared/header.php';
             <p class="status-ok">Settings saved.</p>
         <?php endif; ?>
 
+        <?php if ($csrfError): ?>
+            <p class="status-error">Security validation failed. Please try again.</p>
+        <?php endif; ?>
+
         <form method="post" action="<?= htmlspecialchars(app_url('?page=settings')) ?>" class="settings-form">
             <input type="hidden" name="action" value="save_debug">
+            <input type="hidden" name="csrf_token" value="<?= htmlspecialchars(csrf_token('settings_debug')) ?>">
             <label class="settings-toggle">
                 <input type="checkbox" name="show_debug_panels" value="1" <?= $debugEnabled ? 'checked' : '' ?>>
                 Enable debug panels (header info + DB diagnostics)
@@ -113,10 +129,13 @@ include __DIR__ . '/../app-shared/header.php';
             <p class="status-error">Could not send test email. Check SMTP credentials and server settings.</p>
         <?php elseif ($mailTest === 'invalid'): ?>
             <p class="status-error">Please enter a valid email address for test mail.</p>
+        <?php elseif ($mailTest === 'csrf'): ?>
+            <p class="status-error">Security validation failed. Please try again.</p>
         <?php endif; ?>
 
         <form method="post" action="<?= htmlspecialchars(app_url('?page=settings')) ?>" class="settings-form">
             <input type="hidden" name="action" value="send_test_mail">
+            <input type="hidden" name="csrf_token" value="<?= htmlspecialchars(csrf_token('settings_mail')) ?>">
             <label class="field-label" for="test_email">Send test email to</label>
             <input class="field-input" type="email" name="test_email" id="test_email" required>
             <button type="submit" class="btn-upload">Send Test Email</button>

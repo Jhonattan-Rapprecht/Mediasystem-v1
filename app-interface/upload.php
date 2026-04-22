@@ -10,6 +10,12 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit();
 }
 
+if (!validate_csrf($_POST['csrf_token'] ?? null, 'upload')) {
+    echo "Security validation failed.";
+    header("Refresh: 3; URL=" . (function_exists('app_url') ? app_url() : '/'));
+    exit();
+}
+
 $uploadOk   = 1;
 $target_dir = '';
 $tableName  = '';

@@ -15,19 +15,23 @@ if ($token === '') {
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    if (!validate_csrf($_POST['csrf_token'] ?? null, 'reset_password')) {
+        $error = 'Security validation failed. Please refresh and try again.';
+    }
+
     $token = trim($_POST['token'] ?? '');
     $password = $_POST['password'] ?? '';
     $confirmPassword = $_POST['confirm_password'] ?? '';
 
-    if ($token === '') {
+    if ($error === '' && $token === '') {
         $error = 'Invalid token.';
-    } elseif ($password === '' || $confirmPassword === '') {
+    } elseif ($error === '' && ($password === '' || $confirmPassword === '')) {
         $error = 'Please fill in both password fields.';
-    } elseif (strlen($password) < 8) {
+    } elseif ($error === '' && strlen($password) < 8) {
         $error = 'Password must be at least 8 characters.';
-    } elseif ($password !== $confirmPassword) {
+    } elseif ($error === '' && $password !== $confirmPassword) {
         $error = 'Passwords do not match.';
-    } else {
+    } elseif ($error === '') {
         $conn = createDbConnection();
 
         $conn->query("CREATE TABLE IF NOT EXISTS password_resets (
@@ -92,6 +96,7 @@ include __DIR__ . '/../app-shared/header.php';
             <?php if ($token !== ''): ?>
                 <form method="post" action="<?= htmlspecialchars(app_url('?page=reset-password&token=' . urlencode($token))) ?>" class="settings-form">
                     <input type="hidden" name="token" value="<?= htmlspecialchars($token) ?>">
+                    <input type="hidden" name="csrf_token" value="<?= htmlspecialchars(csrf_token('reset_password')) ?>">
 
                     <label class="field-label" for="password">New Password</label>
                     <input class="field-input" type="password" name="password" id="password" required>

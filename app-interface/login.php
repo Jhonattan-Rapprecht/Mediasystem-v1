@@ -15,6 +15,10 @@ $loggedOut = isset($_GET['loggedout']) && $_GET['loggedout'] === '1';
 $loginRequired = isset($_GET['next']);
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    if (!validate_csrf($_POST['csrf_token'] ?? null, 'login')) {
+        $error = 'Security validation failed. Please refresh and try again.';
+    }
+
     $nextFromPost = $_POST['next'] ?? 'dashboard';
     if (in_array($nextFromPost, $allowedNext, true)) {
         $next = $nextFromPost;
@@ -23,9 +27,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $username = trim($_POST['username'] ?? '');
     $password = $_POST['password'] ?? '';
 
-    if ($username === '' || $password === '') {
+    if ($error === '' && ($username === '' || $password === '')) {
         $error = 'Please enter both username and password.';
-    } else {
+    } elseif ($error === '') {
         require_once __DIR__ . '/../app-database-configuration/db_conn.php';
         $conn = createDbConnection();
 
@@ -73,8 +77,13 @@ include __DIR__ . '/../app-shared/header.php';
             <p class="status-error"><?= htmlspecialchars($error) ?></p>
         <?php endif; ?>
 
+        <?php if (function_exists('sso_enabled') && sso_enabled()): ?>
+            <p class="settings-note">Auth mode is set to SSO. Keep this local form as emergency fallback during rollout.</p>
+        <?php endif; ?>
+
         <form method="post" action="<?= htmlspecialchars(app_url('?page=login&next=' . urlencode($next))) ?>" class="settings-form">
             <input type="hidden" name="next" value="<?= htmlspecialchars($next) ?>">
+            <input type="hidden" name="csrf_token" value="<?= htmlspecialchars(csrf_token('login')) ?>">
 
             <label class="field-label" for="username">Username</label>
             <input class="field-input" type="text" name="username" id="username" autocomplete="username" required>
