@@ -21,6 +21,7 @@
         <a href="<?= htmlspecialchars(app_url('?page=logout')) ?>">Logout</a>
     <?php else: ?>
         <a href="<?= htmlspecialchars(app_url('?page=login')) ?>">Login</a>
+        <a href="<?= htmlspecialchars(app_url('?page=register')) ?>">Register</a>
     <?php endif; ?>
 </nav>
 

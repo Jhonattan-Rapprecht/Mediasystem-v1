@@ -52,7 +52,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 include __DIR__ . '/../app-shared/header.php';
 ?>
 
-<div id="dashboard">
+<div id="dashboard" class="auth-layout">
     <section class="dash-section auth-section">
         <h2>Login</h2>
 
@@ -79,6 +79,11 @@ include __DIR__ . '/../app-shared/header.php';
 
             <button type="submit" class="btn-upload">Login</button>
         </form>
+
+        <p class="auth-links">
+            <a href="<?= htmlspecialchars(app_url('?page=forgot-password')) ?>">Forgot password?</a>
+            <a href="<?= htmlspecialchars(app_url('?page=register')) ?>">Create account</a>
+        </p>
     </section>
 </div>
 

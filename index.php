@@ -53,7 +53,7 @@ function log_out_user(): void {
 }
 
 $page    = $_GET['page'] ?? (is_logged_in() ? 'dashboard' : 'login');
-$allowed = ['dashboard', 'upload', 'settings', 'login', 'logout'];
+$allowed = ['dashboard', 'upload', 'settings', 'login', 'logout', 'register', 'forgot-password', 'reset-password'];
 
 if (!in_array($page, $allowed, true)) {
     $page = is_logged_in() ? 'dashboard' : 'login';
@@ -71,7 +71,7 @@ if (in_array($page, $protectedPages, true) && !is_logged_in()) {
     exit();
 }
 
-if ($page === 'login' && is_logged_in()) {
+if (in_array($page, ['login', 'register', 'forgot-password', 'reset-password'], true) && is_logged_in()) {
     header('Location: ' . app_url());
     exit();
 }

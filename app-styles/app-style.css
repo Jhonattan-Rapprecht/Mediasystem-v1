@@ -357,3 +357,33 @@ body {
     color: #b42318;
     font-weight: 600;
 }
+
+.auth-layout {
+    min-height: calc(100vh - 110px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.auth-section {
+    width: 100%;
+    max-width: 460px;
+}
+
+.auth-links {
+    margin-top: 12px;
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.auth-links a {
+    text-decoration: none;
+    color: #315ea8;
+    font-size: 0.9rem;
+}
+
+.auth-links a:hover {
+    text-decoration: underline;
+}
