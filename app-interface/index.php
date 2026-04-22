@@ -1,8 +1,6 @@
 <?php
 require_once '../app-database-configuration/db_conn.php';
-ob_start();
 $conn = createDbConnection();
-ob_end_clean();
 
 function fetchMedia($conn, $table, $fileCol) {
     $tableEsc = $conn->real_escape_string($table);

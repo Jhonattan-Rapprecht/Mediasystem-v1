@@ -12,16 +12,3 @@
 
 </head>
 <body>
-
-<div id='header-info-panel'>
-
-    <ul>
-        <li><?php echo "<b>The root path: </b>".$_SERVER['DOCUMENT_ROOT']?></li>
-        <li><?php echo "<b>Current Directory: </b>".$_SERVER['PHP_SELF']?></li>
-        <li><?php echo "<b>Testing includes: </b>";$x = 1;if(isset($x)) {include ('../app-test/test_include.php');} else {echo "No includes detected.";}?></li>
-        
-        <li><?php ?></li>
-
-    </ul>
-
-</div>
