@@ -1,0 +1,19 @@
+# Database credentials (never commit real passwords)
+app-database-configuration/db_conn.php
+
+# Uploaded media files (can be large and are user-generated)
+app-media/images/*
+app-media/videos/*
+app-media/music/*
+app-media/documents/*
+
+# Keep the folders themselves
+!app-media/images/.gitkeep
+!app-media/videos/.gitkeep
+!app-media/music/.gitkeep
+!app-media/documents/.gitkeep
+
+# OS / editor noise
+.DS_Store
+Thumbs.db
+*.swp
