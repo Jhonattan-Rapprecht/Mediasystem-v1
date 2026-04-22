@@ -35,11 +35,45 @@ function set_debug_enabled(bool $enabled): void {
     $_SESSION['show_debug_panels'] = $enabled;
 }
 
-$page    = $_GET['page'] ?? 'dashboard';
-$allowed = ['dashboard', 'upload', 'settings'];
+function is_logged_in(): bool {
+    return !empty($_SESSION['auth_user']);
+}
+
+function current_user(): string {
+    return $_SESSION['auth_user'] ?? '';
+}
+
+function log_in_user(string $username): void {
+    $_SESSION['auth_user'] = $username;
+}
+
+function log_out_user(): void {
+    unset($_SESSION['auth_user']);
+    unset($_SESSION['show_debug_panels']);
+}
+
+$page    = $_GET['page'] ?? (is_logged_in() ? 'dashboard' : 'login');
+$allowed = ['dashboard', 'upload', 'settings', 'login', 'logout'];
 
 if (!in_array($page, $allowed, true)) {
-    $page = 'dashboard';
+    $page = is_logged_in() ? 'dashboard' : 'login';
+}
+
+if ($page === 'logout') {
+    log_out_user();
+    header('Location: ' . app_url('?page=login&loggedout=1'));
+    exit();
+}
+
+$protectedPages = ['dashboard', 'upload', 'settings'];
+if (in_array($page, $protectedPages, true) && !is_logged_in()) {
+    header('Location: ' . app_url('?page=login&next=' . urlencode($page)));
+    exit();
+}
+
+if ($page === 'login' && is_logged_in()) {
+    header('Location: ' . app_url());
+    exit();
 }
 
 require __DIR__ . '/app-interface/' . $page . '.php';

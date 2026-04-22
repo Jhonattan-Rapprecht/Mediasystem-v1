@@ -14,8 +14,14 @@
 <body>
 
 <nav class="app-nav">
-    <a href="<?= htmlspecialchars(app_url()) ?>">Dashboard</a>
-    <a href="<?= htmlspecialchars(app_url('?page=settings')) ?>">Settings</a>
+    <?php if (function_exists('is_logged_in') && is_logged_in()): ?>
+        <a href="<?= htmlspecialchars(app_url()) ?>">Dashboard</a>
+        <a href="<?= htmlspecialchars(app_url('?page=settings')) ?>">Settings</a>
+        <span class="nav-user">Signed in as <?= htmlspecialchars(current_user()) ?></span>
+        <a href="<?= htmlspecialchars(app_url('?page=logout')) ?>">Logout</a>
+    <?php else: ?>
+        <a href="<?= htmlspecialchars(app_url('?page=login')) ?>">Login</a>
+    <?php endif; ?>
 </nav>
 
 <?php if (function_exists('is_debug_enabled') && is_debug_enabled()): ?>

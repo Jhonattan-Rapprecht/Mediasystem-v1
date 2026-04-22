@@ -33,6 +33,14 @@ body {
     background: #c7d6f7;
 }
 
+.nav-user {
+    margin-left: auto;
+    align-self: center;
+    color: #555;
+    font-size: 0.88rem;
+    font-weight: 600;
+}
+
 /* ── Header debug panel ── */
 #header-info-panel {
     padding: 8px 16px;
@@ -320,4 +328,32 @@ body {
 .db-fail {
     border-color: #e7a9a9;
     background: #fff1f1;
+}
+
+.auth-section {
+    max-width: 460px;
+}
+
+.field-label {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #2f3b52;
+}
+
+.field-input {
+    border: 1px solid #cfd6e4;
+    border-radius: 6px;
+    padding: 10px 12px;
+    font-size: 0.95rem;
+}
+
+.field-input:focus {
+    outline: none;
+    border-color: #89b4fa;
+    box-shadow: 0 0 0 3px rgba(137, 180, 250, 0.22);
+}
+
+.status-error {
+    color: #b42318;
+    font-weight: 600;
 }
