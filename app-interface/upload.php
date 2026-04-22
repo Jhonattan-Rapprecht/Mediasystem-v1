@@ -6,17 +6,21 @@ $fileType = strtolower(pathinfo($originalFileName, PATHINFO_EXTENSION));
 
 // Determine target directory based on file type
 if (in_array($fileType, array("jpg", "jpeg", "png", "gif"))) {
-    $target_dir = "../app-media/images/";
+    $target_dir = __DIR__ . "/../app-media/images/";
     $tableName = "images";
+    $fileCol   = "images_file_location";
 } elseif (in_array($fileType, array("mp4", "avi", "mov"))) {
-    $target_dir = "../app-media/videos/";
+    $target_dir = __DIR__ . "/../app-media/videos/";
     $tableName = "Video";
+    $fileCol   = "video_file_location";
 } elseif (in_array($fileType, array("mp3", "wav"))) {
-    $target_dir = "../app-media/music/";
+    $target_dir = __DIR__ . "/../app-media/music/";
     $tableName = "Music";
+    $fileCol   = "music_file_location";
 } elseif (in_array($fileType, array("pdf", "doc", "docx"))) {
-    $target_dir = "../app-media/documents/";
+    $target_dir = __DIR__ . "/../app-media/documents/";
     $tableName = "Document";
+    $fileCol   = "document_file_location";
 } else {
     echo "Invalid file type.";
     $uploadOk = 0;
@@ -44,7 +48,7 @@ if ($_FILES["fileToUpload"]["size"] > 5000000000) { // 5GB in bytes
 // If there is an error or invalid file type, delay the redirect by 3 seconds
 if ($uploadOk == 0) {
     echo "<br>Redirecting back to the upload form in 3 seconds...";
-    header("Refresh: 3; URL=index.php"); // Redirect back to index.php after 3 seconds
+    header("Refresh: 3; URL=/");
     exit();
 }
 
@@ -53,25 +57,27 @@ if (move_uploaded_file($_FILES["fileToUpload"]["tmp_name"], $target_file)) {
     echo "The file " . htmlspecialchars($originalFileName) . " has been uploaded successfully.";
 
     // Insert file details into the appropriate table
-    require_once '../app-database-configuration/db_conn.php'; // Include your database connection script
-    $conn = createDbConnection(); // Establish database connection using the function from db_conn.php
+    require_once __DIR__ . '/../app-database-configuration/db_conn.php';
+    $conn = createDbConnection();
 
-    $username = "fakeuser"; // Replace this with the appropriate username
-    $sql = "INSERT INTO $tableName (user, title, ${tableName}_file_location) VALUES ('$username', '$originalFileName', '$target_file')";
+    $username = "fakeuser";
+    $stmt = $conn->prepare("INSERT INTO `$tableName` (user, title, `$fileCol`) VALUES (?, ?, ?)");
+    $stmt->bind_param('sss', $username, $originalFileName, $target_file);
 
-    if ($conn->query($sql) === TRUE) {
+    if ($stmt->execute()) {
         echo " File details inserted into the database successfully.";
     } else {
-        echo " Error inserting file details into the database: " . $conn->error;
+        echo " Error inserting file details into the database: " . htmlspecialchars($stmt->error);
     }
 
-    $conn->close(); // Close the database connection
+    $stmt->close();
+    $conn->close();
 } else {
     echo " Sorry, there was an error uploading your file.";
 }
 
-echo "<br>Redirecting back to the upload form in 3 seconds...";
-header("Refresh: 3; URL=index.php"); // Redirect back to index.php after 3 seconds
+echo "<br>Redirecting back in 3 seconds...";
+header("Refresh: 3; URL=/");
 exit();
 
 ?>

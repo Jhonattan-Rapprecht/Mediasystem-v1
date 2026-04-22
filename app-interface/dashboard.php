@@ -1,5 +1,5 @@
 <?php
-require_once '../app-database-configuration/db_conn.php';
+require_once __DIR__ . '/../app-database-configuration/db_conn.php';
 $conn = createDbConnection();
 
 function fetchMedia($conn, $table, $fileCol) {
@@ -23,7 +23,7 @@ $music     = fetchMedia($conn, 'Music',    'music_file_location');
 $documents = fetchMedia($conn, 'Document', 'document_file_location');
 $conn->close();
 
-include '../app-shared/header.php';
+include __DIR__ . '/../app-shared/header.php';
 ?>
 
 <div id="dashboard">
@@ -32,7 +32,7 @@ include '../app-shared/header.php';
     <section class="dash-section" id="upload-file">
         <h2>&#8679; Upload File</h2>
         <p>Supported formats: JPG, PNG, GIF &bull; MP4, AVI, MOV &bull; MP3, WAV &bull; PDF, DOC, DOCX</p>
-        <form action="upload.php" method="post" enctype="multipart/form-data" class="upload-form">
+        <form action="/?page=upload" method="post" enctype="multipart/form-data" class="upload-form">
             <label class="file-label" for="myFile">Choose File</label>
             <input type="file" id="myFile" name="fileToUpload"
                    accept=".jpg,.jpeg,.png,.gif,.mp4,.avi,.mov,.mp3,.wav,.pdf,.doc,.docx">
@@ -130,11 +130,10 @@ include '../app-shared/header.php';
 </div>
 
 <script>
-    // Show selected filename next to file input
     document.getElementById('myFile').addEventListener('change', function () {
         var label = document.getElementById('file-chosen');
         label.textContent = this.files.length ? this.files[0].name : 'No file chosen';
     });
 </script>
 
-<?php include '../app-shared/footer.php'; ?>
+<?php include __DIR__ . '/../app-shared/footer.php'; ?>
