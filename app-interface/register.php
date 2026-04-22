@@ -1,4 +1,9 @@
 <?php
+if (!defined('APP_BOOTSTRAPPED')) {
+    header('Location: ../index.php?page=login');
+    exit();
+}
+
 require_once __DIR__ . '/../app-database-configuration/db_conn.php';
 
 $error = '';

@@ -1,15 +1,49 @@
 <?php
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $showDebug = isset($_POST['show_debug_panels']) && $_POST['show_debug_panels'] === '1';
-    set_debug_enabled($showDebug);
-    header('Location: ' . app_url('?page=settings&saved=1'));
+if (!defined('APP_BOOTSTRAPPED')) {
+    header('Location: ../index.php?page=login');
     exit();
+}
+
+require_once __DIR__ . '/../app-utils/mail.php';
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $action = $_POST['action'] ?? 'save_debug';
+
+    if ($action === 'save_debug') {
+        $showDebug = isset($_POST['show_debug_panels']) && $_POST['show_debug_panels'] === '1';
+        set_debug_enabled($showDebug);
+        header('Location: ' . app_url('?page=settings&saved=1'));
+        exit();
+    }
+
+    if ($action === 'send_test_mail') {
+        $target = trim($_POST['test_email'] ?? '');
+        if ($target !== '' && filter_var($target, FILTER_VALIDATE_EMAIL)) {
+            $ok = app_send_mail(
+                $target,
+                'Mediasystem SMTP test',
+                'This is a test email from Mediasystem settings.'
+            );
+            header('Location: ' . app_url('?page=settings&mailtest=' . ($ok ? 'ok' : 'fail')));
+            exit();
+        }
+
+        header('Location: ' . app_url('?page=settings&mailtest=invalid'));
+        exit();
+    }
 }
 
 $debugEnabled = is_debug_enabled();
 $saved = isset($_GET['saved']) && $_GET['saved'] === '1';
 $runDbTest = isset($_GET['testdb']) && $_GET['testdb'] === '1';
 $dbStatus = null;
+$mailTest = $_GET['mailtest'] ?? '';
+
+$smtpConfigured = (
+    (getenv('APP_SMTP_HOST') ?: '') !== '' &&
+    (getenv('APP_SMTP_USER') ?: '') !== '' &&
+    (getenv('APP_SMTP_PASS') ?: '') !== ''
+);
 
 if ($debugEnabled && $runDbTest) {
     require_once __DIR__ . '/../app-database-configuration/db_conn.php';
@@ -28,6 +62,7 @@ include __DIR__ . '/../app-shared/header.php';
         <?php endif; ?>
 
         <form method="post" action="<?= htmlspecialchars(app_url('?page=settings')) ?>" class="settings-form">
+            <input type="hidden" name="action" value="save_debug">
             <label class="settings-toggle">
                 <input type="checkbox" name="show_debug_panels" value="1" <?= $debugEnabled ? 'checked' : '' ?>>
                 Enable debug panels (header info + DB diagnostics)
@@ -63,6 +98,35 @@ include __DIR__ . '/../app-shared/header.php';
             <?php endif; ?>
         </section>
     <?php endif; ?>
+
+    <section class="dash-section settings-section">
+        <h2>Mail Settings / Diagnostics</h2>
+        <p class="settings-note">
+            SMTP configured: <strong><?= $smtpConfigured ? 'Yes' : 'No' ?></strong><br>
+            Host: <strong><?= htmlspecialchars((string)(getenv('APP_SMTP_HOST') ?: '-')) ?></strong><br>
+            From: <strong><?= htmlspecialchars((string)(getenv('APP_MAIL_FROM') ?: 'no-reply@localhost')) ?></strong>
+        </p>
+
+        <?php if ($mailTest === 'ok'): ?>
+            <p class="status-ok">Test email sent successfully.</p>
+        <?php elseif ($mailTest === 'fail'): ?>
+            <p class="status-error">Could not send test email. Check SMTP credentials and server settings.</p>
+        <?php elseif ($mailTest === 'invalid'): ?>
+            <p class="status-error">Please enter a valid email address for test mail.</p>
+        <?php endif; ?>
+
+        <form method="post" action="<?= htmlspecialchars(app_url('?page=settings')) ?>" class="settings-form">
+            <input type="hidden" name="action" value="send_test_mail">
+            <label class="field-label" for="test_email">Send test email to</label>
+            <input class="field-input" type="email" name="test_email" id="test_email" required>
+            <button type="submit" class="btn-upload">Send Test Email</button>
+        </form>
+
+        <p class="settings-note">
+            Recommended: install PHPMailer with <code>composer require phpmailer/phpmailer</code>
+            and set env vars: APP_SMTP_HOST, APP_SMTP_PORT, APP_SMTP_USER, APP_SMTP_PASS, APP_MAIL_FROM.
+        </p>
+    </section>
 </div>
 
 <?php include __DIR__ . '/../app-shared/footer.php'; ?>

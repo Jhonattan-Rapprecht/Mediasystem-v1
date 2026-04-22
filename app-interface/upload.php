@@ -1,4 +1,9 @@
 <?php
+if (!defined('APP_BOOTSTRAPPED')) {
+    header('Location: ../index.php?page=login');
+    exit();
+}
+
 // Only handle POST requests - redirect GET back to dashboard
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     header('Location: ' . (function_exists('app_url') ? app_url() : '/'));

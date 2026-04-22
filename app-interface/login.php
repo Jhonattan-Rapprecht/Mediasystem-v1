@@ -1,4 +1,9 @@
 <?php
+if (!defined('APP_BOOTSTRAPPED')) {
+    header('Location: ../index.php?page=login');
+    exit();
+}
+
 $next = $_GET['next'] ?? 'dashboard';
 $allowedNext = ['dashboard', 'settings'];
 if (!in_array($next, $allowedNext, true)) {
