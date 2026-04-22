@@ -19,6 +19,10 @@ body {
     gap: 12px;
 }
 
+.app-nav:empty {
+    display: none;
+}
+
 .app-nav a {
     text-decoration: none;
     color: #1e1e2e;
@@ -386,4 +390,31 @@ body {
 
 .auth-links a:hover {
     text-decoration: underline;
+}
+
+.auth-switch {
+    display: inline-flex;
+    border: 1px solid #d7ddeb;
+    border-radius: 8px;
+    overflow: hidden;
+    margin-bottom: 14px;
+}
+
+.auth-switch-item {
+    text-decoration: none;
+    color: #45506a;
+    background: #f2f5fb;
+    padding: 8px 14px;
+    font-size: 0.88rem;
+    font-weight: 600;
+    border-right: 1px solid #d7ddeb;
+}
+
+.auth-switch-item:last-child {
+    border-right: none;
+}
+
+.auth-switch-item.active {
+    background: #89b4fa;
+    color: #102542;
 }

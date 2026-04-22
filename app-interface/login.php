@@ -63,6 +63,11 @@ include __DIR__ . '/../app-shared/header.php';
 
 <div id="dashboard" class="auth-layout">
     <section class="dash-section auth-section">
+        <div class="auth-switch" role="tablist" aria-label="Authentication pages">
+            <a class="auth-switch-item active" href="<?= htmlspecialchars(app_url('?page=login')) ?>">Login</a>
+            <a class="auth-switch-item" href="<?= htmlspecialchars(app_url('?page=register')) ?>">Register</a>
+        </div>
+
         <h2>Login</h2>
 
         <?php if ($loggedOut): ?>
