@@ -9,6 +9,18 @@ require_once __DIR__ . '/../app-utils/mail.php';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $action = $_POST['action'] ?? 'save_debug';
 
+    if ($action === 'save_theme') {
+        if (!validate_csrf($_POST['csrf_token'] ?? null, 'settings_theme')) {
+            header('Location: ' . app_url('?page=settings&theme=csrf'));
+            exit();
+        }
+
+        $selectedTheme = trim($_POST['theme'] ?? 'normal');
+        set_theme($selectedTheme);
+        header('Location: ' . app_url('?page=settings&theme=saved'));
+        exit();
+    }
+
     if ($action === 'save_debug') {
         if (!validate_csrf($_POST['csrf_token'] ?? null, 'settings_debug')) {
             header('Location: ' . app_url('?page=settings&saved=0&csrf=invalid'));
@@ -49,6 +61,8 @@ $runDbTest = isset($_GET['testdb']) && $_GET['testdb'] === '1';
 $dbStatus = null;
 $mailTest = $_GET['mailtest'] ?? '';
 $csrfError = isset($_GET['csrf']) && $_GET['csrf'] === 'invalid';
+$themeStatus = $_GET['theme'] ?? '';
+$activeTheme = function_exists('current_theme') ? current_theme() : 'normal';
 
 $smtpConfigured = (
     (getenv('APP_SMTP_HOST') ?: '') !== '' &&
@@ -89,6 +103,31 @@ include __DIR__ . '/../app-shared/header.php';
         <p class="settings-note">
             Debug panels are for local troubleshooting only. Keep this disabled in normal usage.
         </p>
+    </section>
+
+    <section class="dash-section settings-section">
+        <h2>Theme</h2>
+
+        <?php if ($themeStatus === 'saved'): ?>
+            <p class="status-ok">Theme updated.</p>
+        <?php elseif ($themeStatus === 'csrf'): ?>
+            <p class="status-error">Security validation failed. Please try again.</p>
+        <?php endif; ?>
+
+        <form method="post" action="<?= htmlspecialchars(app_url('?page=settings')) ?>" class="settings-form">
+            <input type="hidden" name="action" value="save_theme">
+            <input type="hidden" name="csrf_token" value="<?= htmlspecialchars(csrf_token('settings_theme')) ?>">
+
+            <label class="field-label" for="theme">Choose theme</label>
+            <select class="field-input" name="theme" id="theme" required>
+                <option value="normal" <?= $activeTheme === 'normal' ? 'selected' : '' ?>>Normal</option>
+                <option value="dark" <?= $activeTheme === 'dark' ? 'selected' : '' ?>>Dark</option>
+                <option value="grey" <?= $activeTheme === 'grey' ? 'selected' : '' ?>>Grey</option>
+                <option value="extreme-contrast" <?= $activeTheme === 'extreme-contrast' ? 'selected' : '' ?>>Extreme Contrast</option>
+            </select>
+
+            <button type="submit" class="btn-upload">Save Theme</button>
+        </form>
     </section>
 
     <?php if ($debugEnabled): ?>

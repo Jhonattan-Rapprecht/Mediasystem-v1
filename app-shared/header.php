@@ -11,7 +11,7 @@
     <title>Mediasystem-v1</title>
 
 </head>
-<body>
+<body data-theme="<?= htmlspecialchars(function_exists('current_theme') ? current_theme() : 'normal') ?>">
 
 <nav class="app-nav">
     <?php if (function_exists('is_logged_in') && is_logged_in()): ?>

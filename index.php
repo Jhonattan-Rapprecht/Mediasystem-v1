@@ -66,6 +66,21 @@ function set_debug_enabled(bool $enabled): void {
     $_SESSION['show_debug_panels'] = $enabled;
 }
 
+function available_themes(): array {
+    return ['normal', 'dark', 'grey', 'extreme-contrast'];
+}
+
+function current_theme(): string {
+    $theme = $_SESSION['theme'] ?? 'normal';
+    return in_array($theme, available_themes(), true) ? $theme : 'normal';
+}
+
+function set_theme(string $theme): void {
+    if (in_array($theme, available_themes(), true)) {
+        $_SESSION['theme'] = $theme;
+    }
+}
+
 function is_logged_in(): bool {
     return !empty($_SESSION['auth_user']);
 }
